@@ -45,6 +45,59 @@ class spritesheet:
         surface.blit(self.sheet,(x + self.handle[handle][0], y + self.handle[handle][1]),self.cells[cellIndex])
 
 # definir classes de imatges que apareixen per pantalla
+PossObst = (
+    (
+        ("1x-obstacle-large.png"),
+        (6,1,0),
+        (6,1,1),
+        (6,1,2),
+        (6,1,3),
+        (3,1,2),
+        (3,1,0),
+        (3,1,1)
+    ),
+    (
+        ("1x-obstacle-small.png"),
+        (6,1,0),
+        (6,1,2),
+        (6,1,4),
+        (6,1,5),
+        (3,1,0),
+        (3,1,1),
+        (3,1,2)
+        )
+    )
+class obstacle:
+    def __init__(self):
+        self.num = random.randint(0,6)
+        self.SmOrLa = random.randint(0,1)
+        print(self.num)
+        self.image = spritesheet(PossObst[self.SmOrLa][0],PossObst[self.SmOrLa][self.num+1][0],PossObst[self.SmOrLa][self.num+1][1])
+        self.handle = 7
+        self.x = W
+        self.y = H
+        self.velocitat = 5
+    def reinicia(self):
+        self.num = random.randint(0,6)
+        self.SmOrLa = random.randint(0,1)
+        print(self.num)
+        self.image = spritesheet(PossObst[self.SmOrLa][0],PossObst[self.SmOrLa][self.num+1][0],PossObst[self.SmOrLa][self.num+1][1])
+        self.handle = 7
+        self.x = W
+        self.velocitat = 5
+    def actualitza(self,rex):
+        if not((self.y + self.image.h >= rex.y) and (self.x + self.image.w >= rex.x) and (self.x <= rex.x + rex.image.w) and (self.y <= rex.y + rex.image.h)):
+            if self.x >= -10:
+                self.x -= self.velocitat
+            else:
+                self.reinicia()
+            return False
+        else:
+            return True
+    def draw(self):
+        self.image.draw(CANVAS, PossObst[self.num % 2][self.num+1][2] % self.image.totalCellCount, self.x, self.y, self.handle)
+obstacles = obstacle()
+
 class cloud:
     def __init__(self,i):
         self.image = pygame.image.load("1x-cloud.png")
@@ -129,6 +182,7 @@ while not sortir:
     for nuvol in nuvols:
         nuvol.actualitza()
     Trex.actualitza()
+    sortir = obstacles.actualitza(Trex)
 
     
     CANVAS.fill(WHITE)
@@ -137,6 +191,7 @@ while not sortir:
     for terra in terres:
         terra.draw()
     Trex.draw()
+    obstacles.draw()
     
     
     
