@@ -73,7 +73,7 @@ class ground:
             self.x -= self.velocitat
         else:
             self.x = 1200
-    def draw(self):
+    def draw(self) :
         CANVAS.blit(self.image,(self.x,self.y))
 terres = [ground(0), ground(1200)]
 
