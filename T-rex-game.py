@@ -67,6 +67,26 @@ PossObst = (
         (3,1,2)
         )
     )
+
+class counter:
+    def __init__(self):
+        self.image = spritesheet("1x-text.png",19,2)
+        self.count = 0
+        self.handle = 0
+    def drawnum(self,n,x,y):
+        self.image.draw(CANVAS, n % self.image.totalCellCount, x, y, self.handle)
+    def actualitza(self):
+        self.count += 1
+    def draw(self):
+        x = W-75
+        zeros = 5-len(str(self.count))
+        for zero in range(0,zeros):
+            self.drawnum(0,x,0)
+            x += 15
+        for num in str(self.count):
+            self.drawnum(int(num),x,0)
+            x+=15
+contador = counter()
 class obstacle:
     def __init__(self):
         self.num = random.randint(0,6)
@@ -179,15 +199,18 @@ while not sortir:
     
     for terra in terres:
         terra.actualitza()
+    contador.actualitza()
     for nuvol in nuvols:
         nuvol.actualitza()
     Trex.actualitza()
     sortir = obstacles.actualitza(Trex)
+    
 
     
     CANVAS.fill(WHITE)
     for nuvol in nuvols:
         nuvol.draw()
+    contador.draw()
     for terra in terres:
         terra.draw()
     Trex.draw()
