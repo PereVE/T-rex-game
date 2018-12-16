@@ -99,17 +99,18 @@ class obstacle:
         self.x = W
         self.y = H
         self.velocitat = 5
+        self.increment = 0.005
     def reinicia(self):
         self.num = random.randint(0,6)
         self.SmOrLa = random.randint(0,1)
         self.image = spritesheet(PossObst[self.SmOrLa][0],PossObst[self.SmOrLa][self.num+1][0],PossObst[self.SmOrLa][self.num+1][1])
         self.handle = 7
         self.x = W
-        self.velocitat = 5
     def actualitza(self,rex):
         if not((self.y + self.image.h >= rex.y) and (self.x + self.image.w >= rex.x) and (self.x <= rex.x + rex.image.w) and (self.y <= rex.y + rex.image.h)):
             if self.x >= -10:
                 self.x -= self.velocitat
+                self.velocitat += self.increment
             else:
                 self.reinicia()
             return False
@@ -148,9 +149,11 @@ class ground:
         self.x = x
         self.y = H-self.image.get_height()
         self.velocitat = 5
+        self.increment = 0.005
     def actualitza(self):
         if self.x > -1200:
             self.x -= self.velocitat
+            self.velocitat += self.increment
         else:
             self.x = 1200
     def draw(self) :
@@ -228,7 +231,6 @@ while not sortir:
     contador.actualitza()
     for nuvol in nuvols:
         nuvol.actualitza()
-    Trex.actualitza()
     xoc = obstacles.actualitza(Trex)
     if xoc:
         (spritesheet("1x-text.png",1,2)).draw(CANVAS, 1, HW, HH, 4)
@@ -241,12 +243,6 @@ while not sortir:
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 sortir = True
                 xoc = False
-                contador.reinicia()
-                obstacles.reinicia()
-                for nuvol in nuvols:
-                    nuvol.reinicia()
-                Trex.reinicia()
-
             if event.type == KEYDOWN and event.key == K_SPACE:
                 xoc = False
                 contador.reinicia()
@@ -254,8 +250,12 @@ while not sortir:
                 for nuvol in nuvols:
                     nuvol.reinicia()
                 Trex.reinicia()
+                for terra in terres:
+                    terra.velocitat = 5
+                obstacles.velocitat = 5
         
-        
+    
+    Trex.actualitza()
 
     
     CANVAS.fill(WHITE)
