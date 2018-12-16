@@ -73,6 +73,9 @@ class counter:
         self.image = spritesheet("1x-text.png",19,2)
         self.count = 0
         self.handle = 0
+    def reinicia(self):
+        self.count = 0
+        self.handle = 0
     def drawnum(self,n,x,y):
         self.image.draw(CANVAS, n % self.image.totalCellCount, x, y, self.handle)
     def actualitza(self):
@@ -91,7 +94,6 @@ class obstacle:
     def __init__(self):
         self.num = random.randint(0,6)
         self.SmOrLa = random.randint(0,1)
-        print(self.num)
         self.image = spritesheet(PossObst[self.SmOrLa][0],PossObst[self.SmOrLa][self.num+1][0],PossObst[self.SmOrLa][self.num+1][1])
         self.handle = 7
         self.x = W
@@ -100,7 +102,6 @@ class obstacle:
     def reinicia(self):
         self.num = random.randint(0,6)
         self.SmOrLa = random.randint(0,1)
-        print(self.num)
         self.image = spritesheet(PossObst[self.SmOrLa][0],PossObst[self.SmOrLa][self.num+1][0],PossObst[self.SmOrLa][self.num+1][1])
         self.handle = 7
         self.x = W
@@ -120,10 +121,16 @@ obstacles = obstacle()
 
 class cloud:
     def __init__(self,i):
+        self.i = i
         self.image = pygame.image.load("1x-cloud.png")
         self.y = random.randint(10,50)
         self.start_x = random.randint(0,200)
-        self.x = self.start_x + 200*i
+        self.x = self.start_x + 200*self.i
+    def reinicia(self):
+
+        self.y = random.randint(10,50)
+        self.start_x = random.randint(0,200)
+        self.x = self.start_x + 200*self.i
     def actualitza(self):
         if self.x > -200+self.start_x:
             self.x -= 1
@@ -156,9 +163,19 @@ class rex:
         self.x = 50
         self.y = H
         self.index = 2
+        self.const = -math.sqrt(H)
         self.count = 0
         self.salta = False
-        self.salt = -5
+        self.salt  = -5
+        self.handle = 7
+    def reinicia(self):
+        self.x = 50
+        self.y = H
+        self.index = 2
+        self.const = -math.sqrt(H)
+        self.count = 0
+        self.salta = False
+        self.salt  = -5
         self.handle = 7
     def actualitza(self):
         if not self.salta:
@@ -171,20 +188,29 @@ class rex:
                 self.count = 0
         else:
             self.index = 0
-            if self.y + self.salt > self.image.h and self.salt < 0:
-                self.y += self.salt
-            elif self.y + self.salt <= self.image.h:
-                self.salt = -1*self.salt
-            elif self.y + self.salt < H and self.salt > 0:
-                self.y += self.salt
-            elif self.y + self.salt >= H:
-                self.salta = False
-                self.salt = -1*self.salt
+            self.y = int((self.const)**2)
+            self.const += 0.5
+            if self.y > H:
                 self.y = H
+                self.const = -math.sqrt(H)
+                self.salta = False
+        #print(self.y)
+##            self.index = 0
+##            if self.y + self.salt > self.image.h and self.salt < 0:
+##                self.y += self.salt
+##            elif self.y + self.salt <= self.image.h:
+##                self.salt = -1*self.salt
+##            elif self.y + self.salt < H and self.salt > 0:
+##                self.y += self.salt
+##            elif self.y + self.salt >= H:
+##                self.salta = False
+##                self.salt = -1*self.salt
+##                self.y = H
                 
     def draw(self):
         self.image.draw(CANVAS, self.index % self.image.totalCellCount, self.x, self.y, self.handle)
-
+    def xoc(self):
+        self.image.draw(CANVAS, 4 % self.image.totalCellCount, self.x, self.y, self.handle)
 Trex = rex()
 
 # main loop
@@ -203,8 +229,33 @@ while not sortir:
     for nuvol in nuvols:
         nuvol.actualitza()
     Trex.actualitza()
-    sortir = obstacles.actualitza(Trex)
-    
+    xoc = obstacles.actualitza(Trex)
+    if xoc:
+        (spritesheet("1x-text.png",1,2)).draw(CANVAS, 1, HW, HH, 4)
+        CANVAS.blit(pygame.image.load("1x-restart.png"),(HW-18,HH+10))
+        Trex.xoc()
+        pygame.display.update()
+    while xoc:
+        
+        for event in pygame.event.get():
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                sortir = True
+                xoc = False
+                contador.reinicia()
+                obstacles.reinicia()
+                for nuvol in nuvols:
+                    nuvol.reinicia()
+                Trex.reinicia()
+
+            if event.type == KEYDOWN and event.key == K_SPACE:
+                xoc = False
+                contador.reinicia()
+                obstacles.reinicia()
+                for nuvol in nuvols:
+                    nuvol.reinicia()
+                Trex.reinicia()
+        
+        
 
     
     CANVAS.fill(WHITE)
